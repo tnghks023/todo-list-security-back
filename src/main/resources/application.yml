@@ -1,12 +1,15 @@
 spring:
   datasource:
+#    mysql
 #    url: jdbc:mysql://localhost:3306/todolist
 #    username: root
 #    password: 1234
 #    driver-class-name: com.mysql.cj.jdbc.Driver
+#  h2
 #    url: jdbc:h2:mem:testdb
 #    username: sa
 #    sql-script-encoding: UTF-8
+
   h2: #H2 콘솔 활성화
     console:
       enabled: true
@@ -25,5 +28,5 @@ spring:
         use_sql_comments: true
 #    defer-datasource-initialization: true  테이블 생성 후에 data.sql 실행
 jwt:
-  issuer: jwt-issuer@gmail.com
-  secret_key: jwt-secret-key
+  issuer: ${JWT_ISSUER}
+  secret_key: ${JWT_SECRET_KEY}

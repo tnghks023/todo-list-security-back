@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
     public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(1);
-//    public static final String REDIRECT_PATH = "http://localhost:5173/todoList";
+//    public static final String REDIRECT_PATH = "http://localhost:3030/todoList";
     public static final String REDIRECT_PATH = "http://ec2-13-125-238-210.ap-northeast-2.compute.amazonaws.com:5000/todoList";
 
 
@@ -39,8 +39,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws IOException, ServletException {
-        final OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        final User user = userService.findByEmail((String) oAuth2User.getAttributes().get("email"));
+
+        final OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
+        final String registrationId = oAuth2AuthenticationToken.getAuthorizedClientRegistrationId();
+        final OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
+        UserProfile userProfile = OAuthAttributes.extract(registrationId, oAuth2User.getAttributes());
+        final User user = userService.findByEmailAndProvider(userProfile.getEmail(), registrationId);
+
 
         // Generate and save refresh token
         // 리프레시 토큰 생성 -> 저장 -> 쿠키에 저장

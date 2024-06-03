@@ -22,20 +22,32 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
         // 요청을 바탕으로 유저 정보를 담은 객체 반환
         OAuth2User user = super.loadUser(userRequest);
-        saveOrUpdate(user);
+
+        String registrationId = userRequest.getClientRegistration()
+                .getRegistrationId(); // OAuth 서비스 이름(ex. google, naver)
+
+        String userNameAttributeName = userRequest.getClientRegistration()
+                .getProviderDetails()
+                .getUserInfoEndpoint()
+                .getUserNameAttributeName(); // OAuth 로그인 시 키(pk)가 되는 값
+
+        UserProfile userProfile = OAuthAttributes.extract(registrationId, user.getAttributes());
+        userProfile.setProvider(registrationId);
+        saveOrUpdate(userProfile);
         return user;
     }
 
     //유저가 있으면 업데이트, 없으면 유저 생성
-    private User saveOrUpdate(OAuth2User oAuth2User){
-        Map<String, Object> attributes = oAuth2User.getAttributes();
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
-        User user = userRepository.findByEmail(email)
-                .map(entity -> entity.update(name))
+    private User saveOrUpdate(UserProfile userProfile) {
+        String email = userProfile.getEmail();
+        String name = userProfile.getNickname();
+        String provider = userProfile.getProvider();
+        User user = userRepository.findByEmailAndProvider(email,provider )
+                .map(entity -> entity.update(name, email))
                 .orElse(User.builder()
                         .email(email)
                         .nickname(name)
+                        .provider(provider)
                         .build());
         return userRepository.save(user);
     }
