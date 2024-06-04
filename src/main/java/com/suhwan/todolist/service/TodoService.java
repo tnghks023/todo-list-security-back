@@ -7,7 +7,6 @@ import com.suhwan.todolist.repository.TodoRepository;
 import com.suhwan.todolist.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,9 +19,6 @@ public class TodoService {
     public Iterable<Todo> getTodos(String email) {
         return todoRepository.findAllByAuthor(email);
     }
-//    public Iterable<Todo> getTodos() {
-//        return todoRepository.findAll();
-//    }
 
     public Todo insertTodo(AddTodoRequest request, String userName) {
         User user = userRepository.findByEmail(userName).orElseThrow(IllegalAccessError::new);

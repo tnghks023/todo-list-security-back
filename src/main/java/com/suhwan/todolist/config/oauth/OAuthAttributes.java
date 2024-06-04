@@ -19,6 +19,18 @@ public enum OAuthAttributes {
         userProfile.setNickname((String) response.get("name"));
         userProfile.setEmail((String) response.get("email"));
         return userProfile;
+    }),
+    GITHUB("github", (attributes) -> {
+        UserProfile userProfile = new UserProfile();
+        String name = (String)attributes.get("login");
+        if((String) attributes.get("email") == null) {
+            userProfile.setEmail(name);
+        } else {
+            userProfile.setEmail((String) attributes.get("email"));
+        }
+        userProfile.setNickname(name);
+
+        return userProfile;
     }),;
 
     private final String registrationId;

@@ -25,7 +25,6 @@ public class TodoController {
     public ResponseEntity<Iterable<Todo>> getTodos(Principal principal) {
 
         return ResponseEntity.ok(todoService.getTodos(principal.getName()));
-//        return ResponseEntity.ok(todoService.getTodos());
     }
 
 
