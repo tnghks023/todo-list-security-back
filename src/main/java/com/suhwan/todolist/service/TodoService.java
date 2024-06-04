@@ -7,6 +7,9 @@ import com.suhwan.todolist.repository.TodoRepository;
 import com.suhwan.todolist.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,8 +19,9 @@ public class TodoService {
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
 
-    public Iterable<Todo> getTodos(String email) {
-        return todoRepository.findAllByAuthor(email);
+    public Page<Todo> getTodos(String email, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return todoRepository.findAllByAuthor(email, pageable);
     }
 
     public Todo insertTodo(AddTodoRequest request, String userName) {

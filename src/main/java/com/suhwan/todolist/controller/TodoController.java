@@ -4,6 +4,7 @@ import com.suhwan.todolist.domain.Todo;
 import com.suhwan.todolist.dto.AddTodoRequest;
 import com.suhwan.todolist.service.TodoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,9 +23,9 @@ public class TodoController {
     private final TodoService todoService;
 
     @GetMapping
-    public ResponseEntity<Iterable<Todo>> getTodos(Principal principal) {
+    public ResponseEntity<Page<Todo>> getTodos(@RequestParam("page") int page, @RequestParam("size") int size, Principal principal) {
 
-        return ResponseEntity.ok(todoService.getTodos(principal.getName()));
+        return ResponseEntity.ok(todoService.getTodos(principal.getName(), page, size));
     }
 
 
